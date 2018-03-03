@@ -1,0 +1,17 @@
+#!/usr/bin/expect
+
+set timeout 30
+
+set ip_addr [lindex $argv 0]
+set cmd [lindex $argv 1]
+set opt [lindex $argv 2]
+set file [lindex $argv 3]
+
+spawn ssh -n root@$ip_addr $cmd $opt
+
+log_file $file
+
+expect "password:"
+send "1\r"
+
+interact
