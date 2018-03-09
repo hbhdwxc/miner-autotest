@@ -2,10 +2,10 @@
 # Author March 2018 xuzhenxing <xuzhenxing@canaan-creative.com>
 
 # Read AvalonMiner Power
-sudo ./read-power.py
+./read-power.py
 
 # SSH no password
-IP=`cat ip-freq-voltlevel.config | sed -n '2p' | awk '{ print $1 }'`
+IP=`cat ip-freq-voltlevel-devid.config | sed -n '2p' | awk '{ print $1 }'`
 ./ssh-login.exp $IP cgminer-api estats estats.log > /dev/null
 ./ssh-login.exp $IP cgminer-api edevs edevs.log > /dev/null
 ./ssh-login.exp $IP cgminer-api summary summary.log > /dev/null

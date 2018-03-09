@@ -65,14 +65,21 @@ if __name__ == '__main__':
     '''
     data = [0x00, 0x03, 0x00, 0x0e, 0x00, 0x01]
 
-    min_id = raw_input("Please read minimum device ID (1 ~ 247): ")
-    min_id = int(min_id)
+    lnum = 0
+    dev_id = []
+
+    with open("ip-freq-voltlevel-devid.config") as file_object:
+        for line in file_object:
+            lnum += 1
+            if (lnum == 5):
+                dev_id = line.split()
+
+    min_id = int(dev_id[0])
     if (min_id < 1) and (min_id > 247):
         logging.info("Input minimum device ID error.")
         sys.exit()
 
-    max_id = raw_input("Please read maximum device ID (1 ~ 247): ")
-    max_id = int(max_id)
+    max_id = int(dev_id[1])
     if (max_id < 1) and (max_id > 247):
         logging.info("Input maximum device ID error.")
         sys.exit()
@@ -81,7 +88,7 @@ if __name__ == '__main__':
         logging.info("Input device ID error.")
         sys.exit(0)
 
-    power_file = open("avalon-miner-power.log", 'w+')
+    power_file = open("CGMiner_Power.log", 'w+')
 
     for i in range(min_id, max_id + 1):
         data[0] = i

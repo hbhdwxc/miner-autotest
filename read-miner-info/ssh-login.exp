@@ -11,7 +11,4 @@ spawn ssh -n root@$ip_addr $cmd $opt
 
 log_file $file
 
-expect "password:"
-send "1\r"
-
 interact
