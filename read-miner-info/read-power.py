@@ -12,7 +12,7 @@ logging.basicConfig(level=logging.INFO)
 
 # Opening the serial port
 COM_PortName = "/dev/ttyUSB0"
-COM_Port = serial.Serial(COM_PortName)  # Open the COM port
+COM_Port = serial.Serial(COM_PortName, timeout = 3)  # Open the COM port
 logging.debug('Com Port: %s, %s', COM_PortName, 'Opened')
 
 COM_Port.baudrate = 2400                # Set Baud rate
@@ -23,14 +23,17 @@ COM_Port.stopbits = 1                   # Number of Stop bits = 1
 def rs485_read():
     read_data = []
 
-    for i in range(7):
-        rx_data = COM_Port.read()
-        read_data.append(hex(ord(rx_data)))
-    logging.info('Read Bytes: %s', read_data)
+    try:
+        for i in range(7):
+            rx_data = COM_Port.read()
+            read_data.append(hex(ord(rx_data)))
+        logging.info('Read Bytes: %s', read_data)
 
-    valid_data = (int(read_data[3], 16) << 8) | int(read_data[4], 16)
+        valid_data = (int(read_data[3], 16) << 8) | int(read_data[4], 16)
 
-    return valid_data
+        return valid_data
+    except:
+        return 0;
 
 def rs485_write(data):
     bytes_cnt  = COM_Port.write(data)   # Write data to serial port
