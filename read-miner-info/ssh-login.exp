@@ -1,6 +1,6 @@
 #!/usr/bin/expect
 
-set timeout 30
+set timeout 20
 
 set ip_addr [lindex $argv 0]
 set cmd [lindex $argv 1]
