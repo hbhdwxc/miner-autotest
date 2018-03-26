@@ -9,6 +9,8 @@ set file [lindex $argv 3]
 
 spawn ssh -n root@$ip_addr $cmd $opt
 
-log_file $file
+if { $file != "" } {
+    log_file $file
+}
 
 interact
