@@ -1,18 +1,13 @@
 #!/bin/bash
 
-IP_DIR=`cat ip-freq-voltlevel-devid.config | sed -n '2p' | awk '{ print $1 }'`
+IP=`cat ip-freq-voltlevel-devid.config | sed -n '2p' | awk '{ print $1 }'`
 DATE=`date +%Y%m%d%H%M`
-dirname=${IP_DIR}"-"${DATE}
+dirname=${IP}"-"${DATE}"-"$1"-"$2
 mkdir $dirname
 
-cat ip-freq-voltlevel-devid.config | sed -n '2p' | while read IP FREQ VOLT_LEVEL
-do
-	cat estats.log  | grep "\[MM ID" > ./$dirname/CGMiner_Debug.log
-	cat edevs.log | grep -v Reply  > ./$dirname/CGMiner_Edevs.log
-	cat summary.log | grep -v Reply  > ./$dirname/CGMiner_Summary.log
-
-	echo $IP $FREQ $VOLT_LEVEL
-done
+cat estats.log  | grep "\[MM ID" > ./$dirname/CGMiner_Debug.log
+cat edevs.log | grep -v Reply  > ./$dirname/CGMiner_Edevs.log
+cat summary.log | grep -v Reply  > ./$dirname/CGMiner_Summary.log
 
 rm estats.log edevs.log summary.log
 mv CGMiner_Power.log ./$dirname
