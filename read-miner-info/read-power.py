@@ -2,6 +2,11 @@
 # USBTORS485 Converter, Y-1081 USB2.0 to RS485 Converter(FT232 Chip)
 # lllking: DDS238-2 ZN/S
 # Author Feb 2018 xuzhenxing <xuzhenxing@canaan.creative.com>
+#
+# /dev/ttyUSB0 permission
+# Add /etc/udev/rules.d/99-plugdev.rules
+# 99-plugdev.rules: ATTRS{idVendor}=="1d6b", ATTRS{idProduct}=="0002", SUBSYSTEMS=="usb", ACTION=="add", MODE="0666", GROUP="plugdev"
+#
 
 import logging
 import serial
