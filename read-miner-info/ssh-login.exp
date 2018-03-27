@@ -13,4 +13,7 @@ if { $file != "" } {
     log_file $file
 }
 
+expect "password:"
+send "1\r"
+
 interact
