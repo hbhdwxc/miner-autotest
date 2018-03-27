@@ -25,14 +25,20 @@ if [ $idx -eq 2 ];then
 fi
 
 let idx=0
-echo "freq value = $freq_value, volt level value = $volt_level_value"
+echo "freq  = $freq_value, voltage-level = $volt_level_value"
 
 # Config freq voltage-level
-freq=`cat cgminer | grep more_options`
-sed -i "s/$freq/	option more_options '--avalon8-freq $freq_value'/g" cgminer
-
-volt_level=`cat cgminer | grep "voltage_level_offset"`
-sed -i "s/$volt_level/	option voltage_level_offset '$volt_level_value'/g" cgminer
+more_options=`cat cgminer | grep more_options`
+miner_type=`cat ip-freq-voltlevel-devid.config | sed -n '2p' | awk '{ print $2 }'`
+if [ $miner_type == "avalon8" ]; then
+    sed -i "s/$more_options/	option more_options '--avalon8-freq $freq_value --avalon8-voltage-level $volt_level_value'/g" cgminer
+elif [ $miner_type == "avalon9" ]; then
+    sed -i "s/$more_options/	option more_options '--avalon9-freq $freq_value --avalon9-voltage-level $volt_level_value'/g" cgminer
+else
+    echo "avalon type error"
+    rm cgminer
+    exit
+fi
 
 # Cp cgminer to /etc/config
 ./scp-login.exp $IP 1
