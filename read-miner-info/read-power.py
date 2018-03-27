@@ -33,7 +33,7 @@ def rs485_read():
 
         return valid_data
     except:
-        return 0;
+        return 1;
 
 def rs485_write(data):
     bytes_cnt  = COM_Port.write(data)   # Write data to serial port
