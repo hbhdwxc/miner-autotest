@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # USBTORS485 Converter, Y-1081 USB2.0 to RS485 Converter(FT232 Chip)
 # lllking: DDS238-2 ZN/S
 # Author Feb 2018 xuzhenxing <xuzhenxing@canaan.creative.com>
