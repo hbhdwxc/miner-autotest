@@ -9,6 +9,10 @@ IP=`cat ip-freq-voltlevel-devid.config | sed -n '2p' | awk '{ print $1 }'`
 ./scp-login.exp $IP 0
 sleep 3
 
+# Create result directory
+dirip="result-"$IP
+mkdir $dirip
+
 # Config /etc/config/cgminer and restart cgminer, Get Miner debug logs
 for tmp in `cat ip-freq-voltlevel-devid.config | awk 'NR > 7'`;
 do
