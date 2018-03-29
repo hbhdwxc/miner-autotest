@@ -5,7 +5,6 @@ DATE=`date +%Y%m%d%H%M`
 dirname=$IP"-"$DATE"-"$1"-"$2
 mkdir $dirname
 
-
 cat estats.log  | grep "\[MM ID" > ./$dirname/CGMiner_Debug.log
 cat edevs.log | grep -v Reply  > ./$dirname/CGMiner_Edevs.log
 cat summary.log | grep -v Reply  > ./$dirname/CGMiner_Summary.log
@@ -16,33 +15,33 @@ cd ./$dirname
 
 for i in CGMiner_Debug.log
 do
-	cat $i | sed 's/] /\]\n/g' | grep GHSmm | sed 's/GHSmm\[//g' | sed 's/\]//g' > $i.GHSmm
-	cat $i | sed 's/] /\]\n/g' | grep Temp  | sed 's/Temp\[//g'  | sed 's/\]//g' > $i.Temp
-	cat $i | sed 's/] /\]\n/g' | grep TMax  | sed 's/TMax\[//g'  | sed 's/\]//g' > $i.TMax
-	cat $i | sed 's/] /\]\n/g' | grep WU    | sed 's/WU\[//g'    | sed 's/\]//g' > $i.WU
+    cat $i | sed 's/] /\]\n/g' | grep GHSmm | sed 's/GHSmm\[//g' | sed 's/\]//g' > $i.GHSmm
+    cat $i | sed 's/] /\]\n/g' | grep Temp  | sed 's/Temp\[//g'  | sed 's/\]//g' > $i.Temp
+    cat $i | sed 's/] /\]\n/g' | grep TMax  | sed 's/TMax\[//g'  | sed 's/\]//g' > $i.TMax
+    cat $i | sed 's/] /\]\n/g' | grep WU    | sed 's/WU\[//g'    | sed 's/\]//g' > $i.WU
 
-	# According to WU value, calculate GHSav.
-	# Formula: ghsav = WU / 60 * 2^32 /10^9
-	cat $i.WU | awk '{printf ("%.2f\n", ($1/60*2^32/10^9))}' > $i.GHSav
+    # According to WU value, calculate GHSav.
+    # Formula: ghsav = WU / 60 * 2^32 /10^9
+    cat $i.WU | awk '{printf ("%.2f\n", ($1/60*2^32/10^9))}' > $i.GHSav
 
-	Power=CGMiner_Power.log
-	Result=Results_$dirname
+    Power=CGMiner_Power.log
+    Result=Results_$dirname
 
-	# Power ratio
-	paste $i.GHSav $Power | awk '{printf ("%.3f\n", ($2/$1))}' > ph.log
+    # Power ratio
+    paste $i.GHSav $Power | awk '{printf ("%.3f\n", ($2/$1))}' > ph.log
 
-	echo "GHSmm,Temp,TMax,WU,GHSav,Power,PE" > ${Result#.log}.csv
-	paste -d, $i.GHSmm $i.Temp $i.TMax $i.WU $i.GHSav $Power ph.log >> ${Result#.log}.csv
+    echo "GHSmm,Temp,TMax,WU,GHSav,Power,PE" > ${Result#.log}.csv
+    paste -d, $i.GHSmm $i.Temp $i.TMax $i.WU $i.GHSav $Power ph.log >> ${Result#.log}.csv
 
-	for log in *.log
-	do
-	    echo $log >> $dirname
-	    cat $log >> $dirname
-	    echo -e "\n" >> $dirname
-	done
+    for log in *.log
+    do
+        echo $log >> $dirname
+        cat $log >> $dirname
+        echo -e "\n" >> $dirname
+    done
 
-	rm -rf $i.GHSmm $i.Temp $i.TMax $i.WU $i.GHSav ph.log CGMiner_Debug.log CGMiner_Edevs.log CGMiner_Summary.log CGMiner_Power.log
+    rm -rf $i.GHSmm $i.Temp $i.TMax $i.WU $i.GHSav ph.log CGMiner_Debug.log CGMiner_Edevs.log CGMiner_Summary.log CGMiner_Power.log
 
-	cd ..
-	mv ./$dirname ./result*
+    cd ..
+    mv ./$dirname ./result*
 done
