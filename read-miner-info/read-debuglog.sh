@@ -2,7 +2,7 @@
 
 IP=`cat ip-freq-voltlevel-devid.config | sed -n '2p' | awk '{ print $1 }'`
 DATE=`date +%Y%m%d%H%M`
-dirname=$IP"-"$DATE"-"$1"-"$2
+dirname=$IP"-"$DATE"-"$2"-"$4"-"$6"-"$8
 mkdir $dirname
 
 cat estats.log  | grep "\[MM ID" > ./$dirname/CGMiner_Debug.log
@@ -33,14 +33,7 @@ do
     echo "GHSmm,Temp,TMax,WU,GHSav,Power,PE" > ${Result#.log}.csv
     paste -d, $i.GHSmm $i.Temp $i.TMax $i.WU $i.GHSav $Power ph.log >> ${Result#.log}.csv
 
-    for log in *.log
-    do
-        echo $log >> $dirname
-        cat $log >> $dirname
-        echo -e "\n" >> $dirname
-    done
-
-    rm -rf $i.GHSmm $i.Temp $i.TMax $i.WU $i.GHSav ph.log CGMiner_Debug.log CGMiner_Edevs.log CGMiner_Summary.log CGMiner_Power.log
+    rm -rf $i.GHSmm $i.Temp $i.TMax $i.WU $i.GHSav ph.log
 
     cd ..
     mv ./$dirname ./result*
