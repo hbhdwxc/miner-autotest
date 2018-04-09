@@ -113,5 +113,5 @@ if __name__ == '__main__':
         power_file.write(str(power_data))
         power_file.write('\n')
         time.sleep(3)
-
+        del data[6:8]
     COM_Port.close()
