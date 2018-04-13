@@ -1,6 +1,9 @@
 #!/bin/bash
 # Author March 2018 xuzhenxing <xuzhenxing@canaan-creative.com>
 
+# Create result.csv
+echo "Freq,Voltage,GHSmm,Temp,TMax,WU,GHSav,Power,Power/GHSav" > miner-result.csv
+
 # Get raspberry IP address
 IP=`cat ip-freq-voltlevel-devid.config | sed -n '2p' | awk '{ print $1 }'`
 ./scp-login.exp $IP 0
@@ -30,10 +33,11 @@ do
     sleep 1800
 
     # Read AvalonMiner Power
-    ./read-power.py
+    #./read-power.py
 
     # SSH no password
     ./ssh-login.exp $IP cgminer-api "debug\|D" > /dev/null
+    sleep 1
     ./ssh-login.exp $IP cgminer-api estats estats.log > /dev/null
     ./ssh-login.exp $IP cgminer-api edevs edevs.log > /dev/null
     ./ssh-login.exp $IP cgminer-api summary summary.log > /dev/null

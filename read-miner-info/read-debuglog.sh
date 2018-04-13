@@ -9,12 +9,12 @@ cat estats.log  | grep "\[MM ID" > ./$dirname/CGMiner_Debug.log
 cat edevs.log | grep -v Reply  > ./$dirname/CGMiner_Edevs.log
 cat summary.log | grep -v Reply  > ./$dirname/CGMiner_Summary.log
 
-echo "$2" > freq.log
-echo "$4" > voltage.log
-
 rm estats.log edevs.log summary.log
 mv CGMiner_Power.log ./$dirname
 cd ./$dirname
+
+echo "$2" > freq.log
+echo "$4" > voltage.log
 
 for i in CGMiner_Debug.log
 do
@@ -33,8 +33,8 @@ do
     # Power ratio
     paste $i.GHSav $Power | awk '{printf ("%.3f\n", ($2/$1))}' > ph.log
 
-    echo "Freq,Voltage,GHSmm,Temp,TMax,WU,GHSav,Power,PE" > ${Result#.log}.csv
     paste -d, freq.log voltage.log $i.GHSmm $i.Temp $i.TMax $i.WU $i.GHSav $Power ph.log >> ${Result#.log}.csv
+    cat *.csv >> ../miner-result.csv
 
     rm -rf $i.GHSmm $i.Temp $i.TMax $i.WU $i.GHSav ph.log freq.log voltage.log
 
