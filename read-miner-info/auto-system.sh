@@ -27,12 +27,13 @@ do
 
     # CGMiner restart
     ./ssh-login.exp $IP /etc/init.d/cgminer restart
-    sleep 3600
+    sleep 1800
 
     # Read AvalonMiner Power
     ./read-power.py
 
     # SSH no password
+    ./ssh-login.exp $IP cgminer-api "debug\|D" > /dev/null
     ./ssh-login.exp $IP cgminer-api estats estats.log > /dev/null
     ./ssh-login.exp $IP cgminer-api edevs edevs.log > /dev/null
     ./ssh-login.exp $IP cgminer-api summary summary.log > /dev/null
