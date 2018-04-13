@@ -13,6 +13,18 @@ rm estats.log edevs.log summary.log
 mv CGMiner_Power.log ./$dirname
 cd ./$dirname
 
+sum=0
+
+for i in `cat CGMiner_Debug.log | sed 's/] /\]\n/g' | grep "PVT_V" | awk '{ print $3 }'`
+do
+    if [ "$i" != "0" ]; then
+         let sum=sum+$i
+         let cnt=cnt+1
+   fi
+done
+let avg=$sum/$cnt
+echo $avg > vcore.log
+
 echo "$2" > freq.log
 echo "$4" > voltage.log
 
@@ -33,10 +45,10 @@ do
     # Power ratio
     paste $i.GHSav $Power | awk '{printf ("%.3f\n", ($2/$1))}' > ph.log
 
-    paste -d, freq.log voltage.log $i.GHSmm $i.Temp $i.TMax $i.WU $i.GHSav $Power ph.log >> ${Result#.log}.csv
+    paste -d, freq.log voltage.log vcore.log $i.GHSmm $i.Temp $i.TMax $i.WU $i.GHSav $Power ph.log >> ${Result#.log}.csv
     cat *.csv >> ../miner-result.csv
 
-    rm -rf $i.GHSmm $i.Temp $i.TMax $i.WU $i.GHSav ph.log freq.log voltage.log
+    rm -rf $i.GHSmm $i.Temp $i.TMax $i.WU $i.GHSav ph.log freq.log voltage.log vcore.log
 
     cd ..
     mv ./$dirname ./result*
