@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 # Author Feb 2018 xuzhenxing <xuzhenxing@canaan-creative.com>
 
 import serial
