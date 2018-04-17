@@ -30,7 +30,7 @@ echo "$4" > voltage.log
 
 for i in CGMiner_Debug.log
 do
-    cat $i | sed 's/] /\]\n/g' | grep GHSmm\[ | sed 's/GHSmm\[//g' | sed 's/\]//g' > $i.GHSmm
+    cat $i | sed 's/] /\]\n/g' | grep "GHSmm\[" | sed 's/GHSmm\[//g' | sed 's/\]//g' > $i.GHSmm
     cat $i | sed 's/] /\]\n/g' | grep Temp  | sed 's/Temp\[//g'  | sed 's/\]//g' > $i.Temp
     cat $i | sed 's/] /\]\n/g' | grep TMax  | sed 's/TMax\[//g'  | sed 's/\]//g' > $i.TMax
     cat $i | sed 's/] /\]\n/g' | grep WU    | sed 's/WU\[//g'    | sed 's/\]//g' > $i.WU
