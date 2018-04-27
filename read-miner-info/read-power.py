@@ -109,6 +109,10 @@ if __name__ == '__main__':
 
         rs485_write(data)
         power_data = rs485_read()
+        if (power_data < 30):
+            del data[6:8]
+            continue
+
         logging.info('Device ID: %d, Power value: %d', i, power_data)
         power_file.write(str(power_data))
         power_file.write('\n')
