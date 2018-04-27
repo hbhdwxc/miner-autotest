@@ -13,12 +13,28 @@ rm estats.log edevs.log summary.log
 mv CGMiner_Power.log ./$dirname
 cd ./$dirname
 
+sum=0
+
+for i in `cat CGMiner_Debug.log | sed 's/] /\]\n/g' | grep "PVT_V" | awk '{ print $3 }'`
+do
+    if [ "$i" != "0" ]; then
+         let sum=sum+$i
+         let cnt=cnt+1
+   fi
+done
+let avg=$sum/$cnt
+echo $avg > vcore.log
+
+echo "$2" > freq.log
+echo "$4" > voltage.log
+
 for i in CGMiner_Debug.log
 do
-    cat $i | sed 's/] /\]\n/g' | grep GHSmm | sed 's/GHSmm\[//g' | sed 's/\]//g' > $i.GHSmm
+    cat $i | sed 's/] /\]\n/g' | grep "GHSmm\[" | sed 's/GHSmm\[//g' | sed 's/\]//g' > $i.GHSmm
     cat $i | sed 's/] /\]\n/g' | grep Temp  | sed 's/Temp\[//g'  | sed 's/\]//g' > $i.Temp
     cat $i | sed 's/] /\]\n/g' | grep TMax  | sed 's/TMax\[//g'  | sed 's/\]//g' > $i.TMax
     cat $i | sed 's/] /\]\n/g' | grep WU    | sed 's/WU\[//g'    | sed 's/\]//g' > $i.WU
+    cat $i | sed 's/] /\]\n/g' | grep DH    | sed 's/DH\[//g'    | sed 's/\]//g' > $i.DH
 
     # According to WU value, calculate GHSav.
     # Formula: ghsav = WU / 60 * 2^32 /10^9
@@ -30,10 +46,10 @@ do
     # Power ratio
     paste $i.GHSav $Power | awk '{printf ("%.3f\n", ($2/$1))}' > ph.log
 
-    echo "GHSmm,Temp,TMax,WU,GHSav,Power,PE" > ${Result#.log}.csv
-    paste -d, $i.GHSmm $i.Temp $i.TMax $i.WU $i.GHSav $Power ph.log >> ${Result#.log}.csv
+    paste -d, freq.log voltage.log vcore.log $i.GHSmm $i.Temp $i.TMax $i.WU $i.GHSav $Power ph.log $i.DH >> ${Result#.log}.csv
+    cat *.csv >> ../miner-result.csv
 
-    rm -rf $i.GHSmm $i.Temp $i.TMax $i.WU $i.GHSav ph.log
+    rm -rf $i.GHSmm $i.Temp $i.TMax $i.WU $i.GHSav $i.DH ph.log freq.log voltage.log vcore.log
 
     cd ..
     mv ./$dirname ./result*
