@@ -2,7 +2,7 @@
 # Author March 2018 xuzhenxing <xuzhenxing@canaan-creative.com>
 
 # Create result.csv
-echo "Freq,Volt-level,Vcore,GHSmm,Temp,TMax,WU,GHSav,Power,Power/GHSav,DH" > miner-result.csv
+echo "Freq,Volt-level,Vcore,GHSmm,Temp,TMax,WU,GHSav,Power,Power/GHSav,DH,DNA" > miner-result.csv
 
 # Get raspberry IP address
 IP=`cat ip-freq-voltlevel-devid.config | sed -n '2p' | awk '{ print $1 }'`
