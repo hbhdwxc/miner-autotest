@@ -32,7 +32,7 @@ def rs485_read():
         for i in range(7):
             rx_data = COM_Port.read()
             read_data.append(hex(ord(rx_data)))
-        logging.info('Read Bytes: %s', read_data)
+        logging.debug('Read Bytes: %s', read_data)
 
         valid_data = (int(read_data[3], 16) << 8) | int(read_data[4], 16)
 
@@ -113,9 +113,8 @@ if __name__ == '__main__':
             del data[6:8]
             continue
 
-        logging.info('Device ID: %d, Power value: %d', i, power_data)
+        print('Device ID:%d, Power value:%d' % (i, power_data))
         power_file.write(str(power_data))
         power_file.write('\n')
-        time.sleep(3)
         del data[6:8]
     COM_Port.close()
