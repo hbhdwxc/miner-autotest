@@ -7,8 +7,12 @@ set flag [lindex $argv 1]
 
 if { "$flag" == "0" } {
     spawn scp root@$ip_addr:/etc/config/cgminer ./
-} else {
+} elseif { "$flag" == "1" }  {
     spawn scp ./cgminer root@$ip_addr:/etc/config
+} elseif { "$flag" == "2" } {
+    spawn scp root@$ip_addr:/root/CGMiner_Power.log ./
+} else {
+    exit
 }
 
 expect "password:"
