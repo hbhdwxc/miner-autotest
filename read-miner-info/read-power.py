@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 # USBTORS485 Converter, Y-1081 USB2.0 to RS485 Converter(FT232 Chip)
 # lllking: DDS238-2 ZN/S
 # Author Feb 2018 xuzhenxing <xuzhenxing@canaan.creative.com>
@@ -73,32 +73,11 @@ if __name__ == '__main__':
     '''
     data = [0x00, 0x03, 0x00, 0x0e, 0x00, 0x01]
 
-    lnum = 0
-    dev_id = []
-
-    with open("ip-freq-voltlevel-devid.config") as file_object:
-        for line in file_object:
-            lnum += 1
-            if (lnum == 5):
-                dev_id = line.split()
-
-    min_id = int(dev_id[0])
-    if (min_id < 1) and (min_id > 247):
-        logging.info("Input minimum device ID error.")
-        sys.exit()
-
-    max_id = int(dev_id[1])
-    if (max_id < 1) and (max_id > 247):
-        logging.info("Input maximum device ID error.")
-        sys.exit()
-
-    if (min_id > max_id):
-        logging.info("Input device ID error.")
-        sys.exit(0)
-
+    # Read miner power value to file
     power_file = open("CGMiner_Power.log", 'w+')
 
-    for i in range(min_id, max_id + 1):
+    # Read power dev id range: 1 ~ 24
+    for i in range(1, 25):
         data[0] = i
         crc = crc16_bytes(data)
         low = int(crc & 0xff)
