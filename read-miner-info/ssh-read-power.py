@@ -8,6 +8,7 @@ import paramiko
 
 def ssh_read_power(ip):
     passwd = '1'
+    v = None
     retry = 3
     for i in range(0, retry):
         ssh = paramiko.SSHClient()
@@ -24,12 +25,14 @@ def ssh_read_power(ip):
             stdin, stdout, stderr = ssh.exec_command(
                 'python /root/read-power.py')
             time.sleep(2)
+            v = stdout.read().split('\n')[0]
         except:
             ssh.close()
             continue
 
         ssh.close()
         break
+    return v
 
 if __name__ == '__main__':
     ip = sys.argv[1]
