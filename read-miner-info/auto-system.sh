@@ -1,55 +1,61 @@
 #!/bin/bash
 # Author March 2018 xuzhenxing <xuzhenxing@canaan-creative.com>
 
+usr_name=`who | awk '{ print $1 }'`
+
 # Create result.csv
 echo "Freq,Volt-level,Vcore,GHSmm,Temp,TMax,WU,GHSav,Power,Power/GHSav,DH,DNA" > miner-result.csv
 
-# Get raspberry IP address
-IP=`cat ip-freq-voltlevel.config | grep 'CGMiner-IP' | awk '{ print $2 }'`
-ssh-keygen -f "/home/pi/.ssh/known_hosts" -R $IP
-./scp-login.exp $IP 0
+# Openwrt python IP address
+P_IP=`cat ip-freq-voltlevel.config | grep 'Power-IP' | awk '{ print $2 }'`
+ssh-keygen -f "/home/${usr_name}/.ssh/known_hosts" -R ${P_IP} > /dev/null
+
+# Openwrt cgmienr IP address
+C_IP=`cat ip-freq-voltlevel.config | grep 'CGMiner-IP' | awk '{ print $2 }'`
+ssh-keygen -f "/home/${usr_name}/.ssh/known_hosts" -R ${C_IP} > /dev/null
+./scp-login.exp ${C_IP} 0
 sleep 3
 
 # Create result directory
-dirip="result-"$IP
-mkdir $dirip
+dirip="result-"${C_IP}
+mkdir ${dirip}
 
 # Config /etc/config/cgminer and restart cgminer, Get Miner debug logs
 cat ip-freq-voltlevel.config | grep avalon |  while read tmp
 do
     more_options=`cat cgminer | grep more_options`
-    if [ "$more_options" == "" ]; then
+    if [ "${more_options}" == "" ]; then
         echo "option more_options" >> cgminer
     fi
 
     more_options=`cat cgminer | grep more_options`
-    sed -i "s/$more_options/	option more_options '$tmp'/g" cgminer
+    sed -i "s/${more_options}/	option more_options '${tmp}'/g" cgminer
 
     # Cp cgminer to /etc/config
-    ./scp-login.exp $IP 1
+    ./scp-login.exp ${C_IP} 1
     sleep 3
 
     # CGMiner restart
-    ./ssh-login.exp $IP /etc/init.d/cgminer restart
-    sleep 2400
+    ./ssh-login.exp ${C_IP} /etc/init.d/cgminer restart
+    sleep 30
 
     # Read AvalonMiner Power
-    tmp=`cat ip-freq-voltlevel.config | grep 'Power-IP' | awk '{ print $2 }'`
-    ./ssh-read-power.py $tmp
+    ./ssh-read-power.py ${P_IP}
+    sleep 1
 
     # Copy remote power file
-    ./scp-login.exp $IP 2 > /dev/null
+    ./scp-login.exp ${P_IP} 2 > /dev/null
     sleep 3
 
     # SSH no password
-    ./ssh-login.exp $IP cgminer-api "debug\|D" > /dev/null
+    ./ssh-login.exp ${C_IP} cgminer-api "debug\|D" > /dev/null
     sleep 1
-    ./ssh-login.exp $IP cgminer-api estats estats.log > /dev/null
-    ./ssh-login.exp $IP cgminer-api edevs edevs.log > /dev/null
-    ./ssh-login.exp $IP cgminer-api summary summary.log > /dev/null
+    ./ssh-login.exp ${C_IP} cgminer-api estats estats.log > /dev/null
+    ./ssh-login.exp ${C_IP} cgminer-api edevs edevs.log > /dev/null
+    ./ssh-login.exp ${C_IP} cgminer-api summary summary.log > /dev/null
 
     # Read CGMiner Log
-    ./read-debuglog.sh $tmp
+    ./read-debuglog.sh ${tmp}
 done
 
 # Remove cgminer file
