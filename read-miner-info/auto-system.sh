@@ -5,7 +5,7 @@
 echo "Freq,Volt-level,Vcore,GHSmm,Temp,TMax,WU,GHSav,Power,Power/GHSav,DH,DNA" > miner-result.csv
 
 # Get raspberry IP address
-IP=`cat ip-freq-voltlevel-devid.config | sed -n '2p' | awk '{ print $1 }'`
+IP=`cat ip-freq-voltlevel.config | grep 'CGMiner-IP' | awk '{ print $2 }'`
 ssh-keygen -f "/home/pi/.ssh/known_hosts" -R $IP
 ./scp-login.exp $IP 0
 sleep 3
@@ -15,7 +15,7 @@ dirip="result-"$IP
 mkdir $dirip
 
 # Config /etc/config/cgminer and restart cgminer, Get Miner debug logs
-cat ip-freq-voltlevel-devid.config | grep avalon |  while read tmp
+cat ip-freq-voltlevel.config | grep avalon |  while read tmp
 do
     more_options=`cat cgminer | grep more_options`
     if [ "$more_options" == "" ]; then
@@ -34,7 +34,12 @@ do
     sleep 2400
 
     # Read AvalonMiner Power
-    ./read-power.py
+    tmp=`cat ip-freq-voltlevel.config | grep 'Power-IP' | awk '{ print $2 }'`
+    ./ssh-read-power.py $tmp
+
+    # Copy remote power file
+    ./scp-login.exp $IP 2 > /dev/null
+    sleep 3
 
     # SSH no password
     ./ssh-login.exp $IP cgminer-api "debug\|D" > /dev/null
