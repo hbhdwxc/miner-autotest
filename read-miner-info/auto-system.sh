@@ -8,10 +8,12 @@ echo "Freq,Volt-level,Vcore,GHSmm,Temp,TMax,WU,GHSav,Power,Power/GHSav,DH,DNA" >
 
 # Openwrt python IP address
 P_IP=`cat ip-freq-voltlevel.config | grep 'Power-IP' | awk '{ print $2 }'`
+[ -z ${P_IP} ] && exit
 ssh-keygen -f "/home/${usr_name}/.ssh/known_hosts" -R ${P_IP} > /dev/null
 
 # Openwrt cgmienr IP address
 C_IP=`cat ip-freq-voltlevel.config | grep 'CGMiner-IP' | awk '{ print $2 }'`
+[ -z ${C_IP} ] && exit
 ssh-keygen -f "/home/${usr_name}/.ssh/known_hosts" -R ${C_IP} > /dev/null
 ./scp-login.exp ${C_IP} 0
 sleep 3
