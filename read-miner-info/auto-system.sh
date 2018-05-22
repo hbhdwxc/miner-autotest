@@ -60,5 +60,37 @@ do
     ./read-debuglog.sh ${tmp}
 done
 
+more_options_flag=`cat ip-freq-voltlevel.config | grep avalon`
+# more options is null
+if [ -z "${more_options_flag}" ]; then
+    more_options=`cat cgminer | grep more_options`
+    tmp=`echo ${more_options#*more_options} | sed "s/'//g"`
+
+    # Read AvalonMiner Power
+    ./ssh-read-power.py ${P_IP}
+    sleep 1
+
+    # Copy remote power file
+    ./scp-login.exp ${P_IP} 2 > /dev/null
+    sleep 3
+
+    # SSH no password
+    ./ssh-login.exp ${C_IP} cgminer-api estats estats.log > /dev/null
+    debug=`cat estats.log | grep PVT`
+    if [ -z ${debug} ]; then
+        ./ssh-login.exp ${C_IP} cgminer-api "debug\|D" > /dev/null
+        sleep 1
+        rm estats.log
+        ./ssh-login.exp ${C_IP} cgminer-api estats estats.log > /dev/null
+    fi
+
+    sleep 1
+    ./ssh-login.exp ${C_IP} cgminer-api edevs edevs.log > /dev/null
+    ./ssh-login.exp ${C_IP} cgminer-api summary summary.log > /dev/null
+
+    # Read CGMiner Log
+    ./read-debuglog.sh ${tmp}
+fi
+
 # Remove cgminer file
 rm cgminer
