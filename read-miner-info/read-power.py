@@ -17,7 +17,7 @@ logging.basicConfig(level=logging.INFO)
 
 # Opening the serial port
 COM_PortName = "/dev/ttyUSB0"
-COM_Port = serial.Serial(COM_PortName, timeout = 3)  # Open the COM port
+COM_Port = serial.Serial(COM_PortName, timeout = 1)  # Open the COM port
 logging.debug('Com Port: %s, %s', COM_PortName, 'Opened')
 
 COM_Port.baudrate = 2400                # Set Baud rate
@@ -38,7 +38,7 @@ def rs485_read():
 
         return valid_data
     except:
-        return 1;
+        return -1;
 
 def rs485_write(data):
     bytes_cnt  = COM_Port.write(data)   # Write data to serial port
@@ -86,8 +86,12 @@ if __name__ == '__main__':
         data.append(high)
         logging.debug('%s', data)
 
-        rs485_write(data)
-        power_data = rs485_read()
+        for j in range(0, 3):
+            rs485_write(data)
+            power_data = rs485_read()
+            if (power_data > -1):
+                break
+
         if (power_data < 30):
             del data[6:8]
             continue
