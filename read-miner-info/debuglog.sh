@@ -1,21 +1,29 @@
 #!/bin/bash
+#
+# Author June 2018 Zhenxing Xu <xuzhenxing@canaan-creative.com>
+#
 
-IP=`cat ip-freq-voltlevel.config | grep 'CGMiner-IP' | awk '{ print $2 }'`
+IP=$1
+dirip="result-"$IP
 DATE=`date +%Y%m%d%H%M`
-dirname=$IP"-"$DATE"-"$2"-"$4"-"$6"-"$8
-mkdir $dirname
+dirname=$IP"-"$DATE"-"$3"-"$5"-"$7"-"$9
+mkdir -p ./$dirip/$dirname
 
-cat estats.log  | grep "\[MM ID" > ./$dirname/CGMiner_Debug.log
-cat edevs.log | grep -v Reply  > ./$dirname/CGMiner_Edevs.log
-cat summary.log | grep -v Reply  > ./$dirname/CGMiner_Summary.log
+cat ./$dirip/estats.log  | grep "\[MM ID" > ./$dirip/$dirname/CGMiner_Debug.log
+cat ./$dirip/edevs.log | grep -v Reply  > ./$dirip/$dirname/CGMiner_Edevs.log
+cat ./$dirip/summary.log | grep -v Reply  > ./$dirip/$dirname/CGMiner_Summary.log
 
-rm estats.log edevs.log summary.log
-mv CGMiner_Power.log ./$dirname
-cd ./$dirname
+rm ./$dirip/estats.log ./$dirip/edevs.log ./$dirip/summary.log
+mv ./$dirip/CGMiner_Power.log ./$dirip/$dirname
+cd ./$dirip/$dirname
 
 sum=0
+avg_int=0
+avg_float2=0.00
+avg_float3=0.000
 
-for i in `cat CGMiner_Debug.log | sed 's/] /\]\n/g' | grep "PVT_V" | awk '{ print $3 }'`
+# Calc PVT_T average
+for i in `cat CGMiner_Debug.log | grep "MM\ ID1\=" | sed 's/] /\]\n/g' | grep "PVT_V" | sed 's/PVT\_V[0-3]\[//g' | sed 's/\]//g'`
 do
     if [ "$i" != "0" ]; then
          let sum=sum+$i
@@ -25,8 +33,52 @@ done
 let avg=$sum/$cnt
 echo $avg > vcore.log
 
-echo "$2" > freq.log
-echo "$4" > voltage.log
+# Freq and voltage level options
+echo "$3" > freq.log
+echo "$5" > voltage.log
+
+# Average value function
+calc_avg_int() {
+    avg_int=0
+    s_int=0
+    n_int=0
+
+    for l in `cat $1`
+    do
+        let s_int=s_int+$l
+        let n_int=c_int+1
+    done
+
+    let avg_int=${s_int}/${n_int}
+}
+
+calc_avg_float2() {
+    avg_float2=0.00
+    s_float2=0.00
+    c_float2=0
+
+    for m in `cat $1`
+    do
+	s_float2=$(echo "scale=2; ${s_float2} + $m" | bc | awk '{printf "%.2f", $0}')
+        let c_float2=c_float2+1
+    done
+
+    avg_float2=$(echo "scale=2; ${s_float2} / ${c_float2}" | bc)
+}
+
+calc_avg_float3() {
+    avg_float3=0.000
+    s_float3=0.000
+    c_float3=0
+
+    for n in `cat $1`
+    do
+	s_float3=$(echo "scale=3; ${s_float3} + $n" | bc | awk '{printf "%.3f", $0}')
+        let c_float3=c_float3+1
+    done
+
+    avg_float3=$(echo "scale=3; ${s_float3} / ${c_float3}" | bc)
+}
 
 for i in CGMiner_Debug.log
 do
@@ -47,11 +99,43 @@ do
     # Power ratio
     paste $i.GHSav $Power | awk '{printf ("%.3f\n", ($2/$1))}' > ph.log
 
+    # GHSmm average
+    calc_avg_float2 $i.GHSmm
+    echo "${avg_float2}" > ghsmm-avg.log
+
+    # Temp average
+    calc_avg_int $i.Temp
+    echo "${avg_int}" > temp-avg.log
+
+    # TMax average
+    calc_avg_int $i.TMax
+    echo "${avg_int}" > tmax-avg.log
+
+    # WU average
+    calc_avg_float2 $i.WU
+    echo "${avg_float2}" > wu-avg.log
+
+    # GHSav average
+    calc_avg_float2 $i.GHSav
+    echo "${avg_float2}" > ghsav-avg.log
+
+    # Power average
+    calc_avg_int $Power
+    echo "${avg_int}" > power-avg.log
+
+    # Power/GHSav average
+    calc_avg_float3 ph.log
+    echo "${avg_float3}" > ph-avg.log
+
+    # DH average
+    calc_avg_float3 $i.DH
+    echo "${avg_float3}" > dh-avg.log
+
     paste -d, freq.log voltage.log vcore.log $i.GHSmm $i.Temp $i.TMax $i.WU $i.GHSav $Power ph.log $i.DH $i.DNA >> ${Result#.log}.csv
+    paste -d, freq.log voltage.log vcore.log ghsmm-avg.log temp-avg.log tmax-avg.log wu-avg.log ghsav-avg.log power-avg.log ph-avg.log dh-avg.log >> ${Result#.log}.csv
+    echo "" >> ${Result#.log}.csv
     cat *.csv >> ../miner-result.csv
 
     rm -rf $i.GHSmm $i.Temp $i.TMax $i.WU $i.GHSav $i.DH $i.DNA ph.log freq.log voltage.log vcore.log
-
-    cd ..
-    mv ./$dirname ./result*
+    rm -f ghsmm-avg.log temp-avg.log tmax-avg.log wu-avg.log ghsav-avg.log power-avg.log ph-avg.log dh-avg.log
 done
