@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+#
 # USBTORS485 Converter, Y-1081 USB2.0 to RS485 Converter(FT232 Chip)
 # lllking: DDS238-2 ZN/S
 # Author Feb 2018 xuzhenxing <xuzhenxing@canaan.creative.com>
@@ -65,6 +66,10 @@ def crc16_bytes(data):
     return crc
 
 if __name__ == '__main__':
+    ip = sys.argv[1]
+    dirip = "result-" + ip
+    path = "./" + dirip + "/" + "CGMiner_Power.log"
+
     '''
     Device addr; func: read:0x03, write:0x10(16);
     MODBUS protocol read/write
@@ -74,7 +79,7 @@ if __name__ == '__main__':
     data = [0x00, 0x03, 0x00, 0x0e, 0x00, 0x01]
 
     # Read miner power value to file
-    power_file = open("CGMiner_Power.log", 'w+')
+    power_file = open(path, 'w+')
 
     # Read power dev id range: 1 ~ 24
     for i in range(1, 25):
