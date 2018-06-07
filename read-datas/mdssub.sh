@@ -3,11 +3,14 @@
 # Author March 2018 Zhenxing Xu <xuzhenxing@canaan-creative.com>
 #
 
-# Create result directory
 [ -z $1 ] && exit
+time=$1
+
+# Create result directory
 [ -z $2 ] && exit
-CIP=$1
-PIP=$2
+[ -z $3 ] && exit
+CIP=$2
+PIP=$3
 dirip="result-"$CIP
 mkdir $dirip
 
@@ -35,7 +38,7 @@ do
 
     # CGMiner restart
     ./ssh-login.exp $CIP /etc/init.d/cgminer restart
-    sleep 30
+    sleep $time
 
     # Read AvalonMiner Power
     ./ssh-power.py $PIP
