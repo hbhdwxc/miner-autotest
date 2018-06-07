@@ -26,30 +26,11 @@ COM_Port.bytesize = 8                   # Number of data bits = 8
 COM_Port.parity   = 'N'                 # No parity
 COM_Port.stopbits = 1                   # Number of Stop bits = 1
 
-def rs485_read():
-    read_data = []
-
-    try:
-        for i in range(7):
-            rx_data = COM_Port.read()
-            read_data.append(hex(ord(rx_data)))
-        logging.debug('Read Bytes: %s', read_data)
-
-        valid_data = (int(read_data[3], 16) << 8) | int(read_data[4], 16)
-
-        return valid_data
-    except:
-        return -1;
-
-def rs485_write(data):
-    bytes_cnt  = COM_Port.write(data)   # Write data to serial port
-    logging.debug('Write Count = %d. %s ', bytes_cnt, 'bytes written')
-
 # CRC16-MODBUS
 def crc16_byte(data):
     crc = data
 
-    for i in range(8):
+    for k in range(8):
         if (crc & 0x01):
             crc = (crc >> 1) ^ 0xa001
         else:
@@ -65,10 +46,36 @@ def crc16_bytes(data):
 
     return crc
 
+def rs485_read():
+    read_data = []
+    tmp_data = []
+
+    try:
+        for n in range(7):
+            rx_data = COM_Port.read()
+            read_data.append(hex(ord(rx_data)))
+        logging.debug('Read Bytes: %s', read_data)
+
+        valid_data = (int(read_data[3], 16) << 8) | int(read_data[4], 16)
+
+        read_crc = (int(read_data[6], 16) << 8) | int(read_data[5], 16)
+        del read_data[5:7]
+        for m in range(len(read_data)):
+            tmp_data.append(int(read_data[m], 16))
+        tmp_crc = crc16_bytes(tmp_data)
+        if (read_crc != tmp_crc):
+            valid_data = -1
+
+        return valid_data
+    except:
+        return -1
+
+def rs485_write(data):
+    bytes_cnt  = COM_Port.write(data)   # Write data to serial port
+    logging.debug('Write Count = %d. %s ', bytes_cnt, 'bytes written')
+
 if __name__ == '__main__':
-    ip = sys.argv[1]
-    dirip = "result-" + ip
-    path = "./" + dirip + "/" + "CGMiner_Power.log"
+    path = "CGMiner_Power.log"
 
     '''
     Device addr; func: read:0x03, write:0x10(16);
