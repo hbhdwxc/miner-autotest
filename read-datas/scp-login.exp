@@ -1,4 +1,7 @@
 #!/usr/bin/expect
+#
+# Author March 2018 Zhenxing Xu <xuzhenxing@canaan-creative.com>
+#
 
 set timeout 20
 

@@ -1,4 +1,7 @@
 #!/usr/bin/env python
+#
+# Author March 2018 Zhenxing Xu <xuzhenxing@canaan-creative.com>
+#
 
 from __future__ import print_function
 import telnetlib

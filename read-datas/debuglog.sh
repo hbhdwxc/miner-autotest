@@ -24,7 +24,7 @@ avg_float2=0.00
 avg_float3=0.000
 
 # Calc PVT_T average
-for i in `cat CGMiner_Debug.log | grep "MM\ ID1\=" | sed 's/] /\]\n/g' | grep "PVT_V" | sed 's/PVT\_V[0-3]\[//g' | sed 's/\]//g'`
+for i in `cat CGMiner_Debug.log | sed 's/] /\]\n/g' | grep "PVT_V" | sed 's/PVT\_V[0-3]\[//g' | sed 's/\]//g'`
 do
     if [ "$i" != "0" ]; then
          let sum=sum+$i
@@ -87,7 +87,7 @@ do
     cat $i | sed 's/] /\]\n/g' | grep Temp  | sed 's/Temp\[//g'  | sed 's/\]//g' > $i.Temp
     cat $i | sed 's/] /\]\n/g' | grep TMax  | sed 's/TMax\[//g'  | sed 's/\]//g' > $i.TMax
     cat $i | sed 's/] /\]\n/g' | grep WU    | sed 's/WU\[//g'    | sed 's/\]//g' > $i.WU
-    cat $i | sed 's/] /\]\n/g' | grep DH    | sed 's/DH\[//g'    | sed 's/\]//g' > $i.DH
+    cat $i | sed 's/] /\]\n/g' | grep DH    | sed 's/DH\[//g'    | sed 's/\]//g' | sed 's/\%//g' > $i.DH
     cat $i | sed 's/] /\]\n/g' | grep DNA   | sed 's/DNA\[//g'   | sed 's/\]//g' | cut -b 13- > $i.DNA
 
     # According to WU value, calculate GHSav.

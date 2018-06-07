@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Author March 2018 xuzhenxing <xuzhenxing@canaan-creative.com>
+# Author March 2018 Zhenxing Xu <xuzhenxing@canaan-creative.com>
 #
 
 # Create result directory
