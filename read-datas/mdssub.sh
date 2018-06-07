@@ -57,7 +57,7 @@ do
     ./ssh-login.exp $CIP cgminer-api summary ./$dirip/summary.log > /dev/null
 
     # Read CGMiner Log
-    ./debuglog.sh $tmp
+    ./debuglog.sh $CIP $tmp
 done
 
 # Remove cgminer file
