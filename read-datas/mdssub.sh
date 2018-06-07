@@ -11,10 +11,6 @@ PIP=$2
 dirip="result-"$CIP
 mkdir $dirip
 
-user=`who | awk '{ print $1 }'`
-ssh-keygen -f "/home/$user/.ssh/known_hosts" -R $CIP > /dev/null
-ssh-keygen -f "/home/$user/.ssh/known_hosts" -R $PIP > /dev/null
-
 # Copy CGMiner configuration file
 ./scp-login.exp $CIP $dirip 0
 sleep 3
