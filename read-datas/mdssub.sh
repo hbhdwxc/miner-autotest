@@ -23,7 +23,7 @@ sleep 3
 echo "Freq,Volt-level,Vcore,GHSmm,Temp,TMax,WU,GHSav,Power,Power/GHSav,DH,DNA" > ./$dirip/miner-result.csv
 
 # Config /etc/config/cgminer and restart cgminer, Get Miner debug logs
-cat miner-options.config | grep avalon |  while read tmp
+cat miner-options.conf | grep avalon |  while read tmp
 do
     more_options=`cat ./$dirip/cgminer | grep more_options`
     if [ "$more_options" == "" ]; then
@@ -60,7 +60,7 @@ do
     ./debuglog.sh $tmp
 done
 
-more_options_flag=`cat miner-options.config | grep avalon`
+more_options_flag=`cat miner-options.conf | grep avalon`
 # more options is null
 if [ -z "${more_options_flag}" ]; then
     more_options=`cat ./$dirip/cgminer | grep more_options`
