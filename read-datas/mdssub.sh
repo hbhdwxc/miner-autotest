@@ -19,7 +19,7 @@ mkdir $dirip
 sleep 3
 
 # Create result.csv
-echo "Freq,Volt-level,Vcore,GHSmm,Temp,TMax,WU,GHSav,Power,Power/GHSav,DH,DNA" > ./$dirip/miner-result.csv
+echo "Volt-level,Temp,TMax,WU,GHSav,DH,DNA" > ./$dirip/miner-result.csv
 
 # Config /etc/config/cgminer and restart cgminer, Get Miner debug logs
 cat miner-options.conf | grep avalon |  while read tmp
@@ -38,58 +38,28 @@ do
 
     # CGMiner restart
     ./ssh-login.exp $CIP /etc/init.d/cgminer restart
-    sleep $time
 
-    # Read AvalonMiner Power
-    ./ssh-power.py $PIP
-    sleep 1
+    for i in `seq 0 24`
+    do
+        sleep $time
 
-    # Copy remote power file
-    ./scp-login.exp $PIP $dirip 2 > /dev/null
-    sleep 3
+        # Read AvalonMiner Power
+        ./ssh-power.py $PIP
+        sleep 1
 
-    # SSH no password
-    ./ssh-login.exp $CIP cgminer-api "debug\|D" > /dev/null
-    sleep 1
-    ./ssh-login.exp $CIP cgminer-api estats ./$dirip/estats.log > /dev/null
-    ./ssh-login.exp $CIP cgminer-api edevs ./$dirip/edevs.log > /dev/null
-    ./ssh-login.exp $CIP cgminer-api summary ./$dirip/summary.log > /dev/null
+        # Copy remote power file
+        ./scp-login.exp $PIP $dirip 2 > /dev/null
+        sleep 3
 
-    # Read CGMiner Log
-    ./debuglog.sh $CIP $tmp
-done
-
-more_options_flag=`cat miner-options.conf | grep avalon`
-# more options is null
-if [ -z "${more_options_flag}" ]; then
-    more_options=`cat ./$dirip/cgminer | grep more_options`
-    tmp=`echo ${more_options#*more_options} | sed "s/'//g"`
-
-    # Read AvalonMiner Power
-    ./ssh-power.py $PIP
-    sleep 1
-
-    # Copy remote power file
-    ./scp-login.exp $PIP $dirip 2 > /dev/null
-    sleep 3
-
-    # SSH no password
-    ./ssh-login.exp $CIP cgminer-api estats ./$dirip/estats.log > /dev/null
-    debug=`cat ./$dirip/estats.log | grep PVT`
-    if [ -z $debug ]; then
+        # SSH no password
         ./ssh-login.exp $CIP cgminer-api "debug\|D" > /dev/null
         sleep 1
-        rm ./$dirip/estats.log
         ./ssh-login.exp $CIP cgminer-api estats ./$dirip/estats.log > /dev/null
-    fi
 
-    sleep 1
-    ./ssh-login.exp $CIP cgminer-api edevs ./$dirip/edevs.log > /dev/null
-    ./ssh-login.exp $CIP cgminer-api summary ./$dirip/summary.log > /dev/null
-
-    # Read CGMiner Log
-    ./debuglog.sh $CIP $tmp
-fi
+        # Read CGMiner Log
+        ./debuglog.sh $CIP $tmp
+    done
+done
 
 # Remove cgminer file
 rm ./$dirip/cgminer
