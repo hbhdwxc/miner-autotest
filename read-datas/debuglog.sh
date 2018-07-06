@@ -12,11 +12,15 @@ mkdir -p ./$dirip/$dirname
 cat ./$dirip/estats.log  | grep "\[MM ID" > ./$dirip/$dirname/CGMiner_Debug.log
 
 rm ./$dirip/estats.log
-mv ./$dirip/CGMiner_Power.log ./$dirip/$dirname
+#mv ./$dirip/CGMiner_Power.log ./$dirip/$dirname
 cd ./$dirip/$dirname
 
 # Freq and voltage level options
-echo "$3" > voltage.log
+vol_cnt=`cat CGMiner_Debug.log | grep "\,MM ID"`
+for i in `seq 1 $vol_cnt`
+do
+    echo "$3" >> voltage.log
+done
 
 for i in CGMiner_Debug.log
 do
@@ -30,15 +34,15 @@ do
     # Formula: ghsav = WU / 60 * 2^32 /10^9
     cat $i.WU | awk '{printf ("%.2f\n", ($1/60*2^32/10^9))}' > $i.GHSav
 
-    paste -d, voltage.log $i.Temp $i.TMax $i.WU $i.GHSav $i.DH $i.DNA >> ../miner-result.csv
+    paste -d, voltage.log $i.Temp $i.TMax $i.WU $i.GHSav $i.DH $i.DNA > ../miner-result.csv
 
     # split DNA
     cnt=`cat ../miner-result.csv | wc -l`
-    for i in `seq 2 $cnt`
+    for i in `seq 1 $cnt`
     do
-        str=`sed -n "${i}p" ../miner-result`
+        str=`sed -n "${i}p" ../miner-result.csv`
         array=(${str//,/ })
-        name=${array[5]}
+        name=${array[6]}
         echo $str >> ../miner-result-${name}.csv
     done
 
