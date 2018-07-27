@@ -5,7 +5,7 @@
 
 IP=$1
 dirip="result-"$IP
-DATE=`date +%Y%m%d%H%M`
+DATE=`date +%Y%m%d%H%M%S`
 dirname=$IP"-"$DATE"-"$3
 mkdir -p ./$dirip/$dirname
 
@@ -16,7 +16,7 @@ rm ./$dirip/estats.log
 cd ./$dirip/$dirname
 
 # Freq and voltage level options
-vol_cnt=`cat CGMiner_Debug.log | grep "\,MM ID"`
+vol_cnt=`cat CGMiner_Debug.log | grep "\[MM ID" | wc -l`
 for i in `seq 1 $vol_cnt`
 do
     echo "$3" >> voltage.log
@@ -41,8 +41,7 @@ do
     for i in `seq 1 $cnt`
     do
         str=`sed -n "${i}p" ../miner-result.csv`
-        array=(${str//,/ })
-        name=${array[6]}
+        name=`echo ${str} | cut -d \, -f  7`
         echo $str >> ../miner-result-${name}.csv
     done
 
