@@ -15,7 +15,8 @@ do
     ./mdssub.sh $time $tmp &
     sleep 5
 
-    while true
+done
+while true
     do
         cnt=`ps -ef | grep mdssub | wc -l`
         if [ $cnt -le '2' ]; then
@@ -26,4 +27,4 @@ do
         sleep 5
         echo "++++++++++++++++++++++++++++++ Running ++++++++++++++++++++++++++++++"
     done
-done
+
