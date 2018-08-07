@@ -46,4 +46,20 @@ do
     done
 
     rm -rf voltage.log $i.Temp $i.TMax $i.WU $i.GHSav $i.DH $i.DNA
+
+
+    #add new file LotWaferID.csv to store the lotid && waferid info, backup for later use 
+    cat $i | sed 's/] /\]\n/g' | grep DNA        | sed 's/DNA\[//g'         | sed 's/\]//g' | cut -b 13- > $i.DNA
+    cat $i | sed 's/] /\]\n/g' | grep LotID0     | sed 's/LotID.*\[//g'     | sed 's/\]//g' > $i.lotid0
+    cat $i | sed 's/] /\]\n/g' | grep LotID1     | sed 's/LotID.*\[//g'     | sed 's/\]//g' > $i.lotid1
+    cat $i | sed 's/] /\]\n/g' | grep LotID2     | sed 's/LotID.*\[//g'     | sed 's/\]//g' > $i.lotid2
+    cat $i | sed 's/] /\]\n/g' | grep LotID3     | sed 's/LotID.*\[//g'     | sed 's/\]//g' > $i.lotid3
+    cat $i | sed 's/] /\]\n/g' | grep WaferID0   | sed 's/WaferID.*\[//g'   | sed 's/\]//g' > $i.waferid0
+    cat $i | sed 's/] /\]\n/g' | grep WaferID1   | sed 's/WaferID.*\[//g'   | sed 's/\]//g' > $i.waferid1
+    cat $i | sed 's/] /\]\n/g' | grep WaferID2   | sed 's/WaferID.*\[//g'   | sed 's/\]//g' > $i.waferid2
+    cat $i | sed 's/] /\]\n/g' | grep WaferID3   | sed 's/WaferID.*\[//g'   | sed 's/\]//g' > $i.waferid3
+    paste -d, $i.DNA $i.lotid0 $i.lotid1 $i.lotid2 $i.lotid3 $i.waferid0 $i.waferid1 $i.waferid2 $i.waferid3 > ./LotWaferID.csv
+
+    rm -rf $i.DNA $i.lotid0 $i.lotid1 $i.lotid2 $i.lotid3 $i.waferid0 $i.waferid1 $i.waferid2 $i.waferid3
+
 done
